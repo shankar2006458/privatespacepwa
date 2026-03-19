@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ec4899">
+    <title>Our Private Space | Romantic Couple App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fdf2f8 0%, #f3e8ff 50%, #ede9fe 100%);
+            color: #333;
+            transition: background 0.35s ease, color 0.35s ease;
+            will-change: background, color;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2d1b4e 100%);
+            color: #f5f3ff;
+        }
+
+        .main-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .main-wrapper.ready {
+            opacity: 1;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+        }
+
+        body.dark-mode .glass {
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+        }
+
+        .orb-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float-orb 15s ease-in-out infinite;
+        }
+
+        .orb1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(236, 72, 153, 0.3);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb2 {
+            width: 250px;
+            height: 250px;
+            background: rgba(168, 85, 247, 0.3);
+            top: 50%;
+            right: -50px;
+            animation-delay: 2s;
+        }
+
+        .orb3 {
+            width: 200px;
+            height: 200px;
+            background: rgba(236, 72, 153, 0.2);
+            bottom: 0;
+            left: 30%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float-orb {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(20px, -30px); }
+            50% { transform: translate(-10px, 20px); }
+            75% { transform: translate(30px, 10px); }
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: drift 8s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes drift {
+            to { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+
+        #welcomeScreen {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(20px, 5vw, 40px);
+            text-align: center;
+        }
+
+        .welcome-content h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-content p {
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            opacity: 0.7;
+            margin-bottom: clamp(30px, 8vw, 50px);
+        }
+
+        .role-buttons {
+            display: flex;
+            gap: clamp(15px, 4vw, 30px);
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .role-btn {
+            padding: clamp(20px, 5vw, 30px) clamp(25px, 6vw, 40px);
+            border: none;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-weight: 600;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+        }
+
+        .role-btn-him {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+        }
+
+        .role-btn-her {
+            background: linear-gradient(135deg, #ec4899, #be123c);
+            color: white;
+        }
+
+        .role-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .role-btn:active {
+            transform: scale(0.95);
+        }
+
+        .role-emoji {
+            font-size: clamp(2rem, 6vw, 3rem);
+        }
+
+        #dashboardScreen {
+            flex-direction: column;
+        }
+
+        .dashboard-header {
+            padding: clamp(15px, 4vw, 25px) clamp(15px, 5vw, 30px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .dashboard-header {
+            border-bottom-color: rgba(168, 85, 247, 0.2);
+        }
+
+        .header-left {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .header-left h2 {
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header-info {
+            display: flex;
+            gap: clamp(10px, 3vw, 20px);
+            align-items: center;
+            font-size: clamp(0.75rem, 2vw, 0.95rem);
+            flex-wrap: wrap;
+        }
+
+        .role-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .role-badge {
+            background: rgba(168, 85, 247, 0.2);
+            color: #d8b4fe;
+        }
+
+        .online-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            white-space: nowrap;
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: clamp(40px, 10vw, 45px);
+            height: clamp(40px, 10vw, 45px);
+            border: none;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        body.dark-mode .icon-btn {
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+            background: rgba(168, 85, 247, 0.3);
+        }
+
+        .dashboard-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(15px, 4vw, 30px);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: clamp(15px, 4vw, 25px);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            padding: clamp(20px, 5vw, 30px);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .partner-mood-card {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.15));
+        }
+
+        body.dark-mode .partner-mood-card {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2));
+        }
+
+        .mood-emoji {
+            font-size: clamp(3rem, 12vw, 5rem);
+            margin: 20px 0;
+            animation: float-mood 3s ease-in-out infinite;
+        }
+
+        @keyframes float-mood {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .mood-text {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            opacity: 0.8;
+        }
+
+        .emotions-card {
+            grid-column: 1 / -1;
+        }
+
+        .emotions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+       
+        /* Hide extra buttons completely */
+        .emotions-grid:not(.expanded) .emotion-btn:nth-child(n+5) {
+            display: none;
+        }
+
+
+        @keyframes moodFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Animate only when expanded */
+        .emotions-grid.expanded .emotion-btn:nth-child(n+5) {
+            animation: moodFadeIn 0.35s ease forwards;
+        }
+
+
+        .show-more-btn {
+            margin-top: 15px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: #ec4899;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        body.dark-mode .show-more-btn {
+            color: #d8b4fe;
+        }
+
+
+
+        @media (max-width: 640px) {
+            .emotions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .emotion-btn {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 16px;
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+        }
+
+        body.dark-mode .emotion-btn {
+            background: rgba(30, 27, 75, 0.6);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+        }
+
+        .emotion-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .emotion-btn:active {
+            transform: scale(0.9);
+        }
+
+        body.dark-mode .emotion-btn:hover {
+            background: rgba(30, 27, 75, 0.8);
+        }
+
+        .love-counter-card {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(244, 114, 182, 0.1));
+        }
+
+        body.dark-mode .love-counter-card {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.15));
+        }
+
+        .heart-button {
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .heart-button:hover {
+            transform: scale(1.2);
+        }
+
+        .heart-button:active {
+            animation: heart-pulse 0.6s ease-out;
+        }
+
+        @keyframes heart-pulse {
+            0% { transform: scale(1.2); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+
+        .love-count {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 15px 0;
+        }
+
+        .love-label {
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            opacity: 0.7;
+        }
+
+        .thinking-card {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+            text-align: center;
+        }
+
+        .thinking-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: clamp(12px, 3vw, 15px) clamp(20px, 5vw, 30px);
+            border-radius: 12px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .thinking-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .thinking-btn:active {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff, #f3e8ff);
+            padding: clamp(30px, 8vw, 50px) clamp(20px, 6vw, 40px);
+            border-radius: 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            animation: modal-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .modal-content {
+            background: linear-gradient(135deg, #1e1b4b, #2d1b4e);
+        }
+
+        @keyframes modal-pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-emoji {
+            font-size: clamp(2.5rem, 10vw, 4rem);
+            margin-bottom: 20px;
+            animation: bounce-modal 0.8s infinite;
+        }
+
+        @keyframes bounce-modal {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .modal-title {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark-mode .modal-title {
+            background: linear-gradient(135deg, #f472b6, #d8b4fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-desc {
+            font-size: clamp(0.95rem, 3vw, 1.1rem);
+            opacity: 0.7;
+            margin-bottom: 30px;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-btn {
+            padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 30px);
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .modal-btn-secondary {
+            background: rgba(200, 200, 200, 0.3);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+
+        body.dark-mode .modal-btn-secondary {
+            background: rgba(100, 100, 100, 0.3);
+            border: 1px solid rgba(150, 150, 150, 0.3);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(200, 200, 200, 0.5);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: clamp(15px, 4vw, 30px);
+            right: clamp(15px, 4vw, 30px);
+            left: clamp(15px, 4vw, 30px);
+            padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            animation: slide-up 0.4s ease-out;
+            z-index: 999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            margin: 0 auto;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        }
+
+        @media (max-width: 640px) {
+            .toast {
+                left: auto;
+                right: 15px;
+                width: auto;
+            }
+        }
+
+        @keyframes slide-up {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(236, 72, 153, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(236, 72, 153, 0.8);
+        }
+
+        body.dark-mode ::-webkit-scrollbar-track {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #fdf2f8, #f3e8ff, #ede9fe);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        body.dark-mode .loader {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #2d1b4e);
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-heart {
+            font-size: 4rem;
+            animation: pulseHeart 1.5s ease-in-out infinite, floatLoader 3s ease-in-out infinite;
+        }
+
+        @keyframes floatLoader {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+
+        .loader-text {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .together-card {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.15));
+        }
+
+        .together-date {
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+
+        .together-live {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .time-box {
+            position: relative;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 16px 8px;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s ease;
+        }
+
+        .time-box:hover {
+            transform: translateY(-4px);
+        }
+
+        body.dark-mode .time-box {
+            background: rgba(30, 27, 75, 0.7);
+        }
+
+        .time-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ec4899, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-style: preserve-3d;
+            transition: transform 0.4s ease, opacity 0.3s ease;
+        }
+
+
+        .time-label {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 640px) {
+            .together-live {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes softPulse {
+            0%, 100% { box-shadow: 0 0 0px rgba(236, 72, 153, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(236, 72, 153, 0.25); }
+        }
+
+        .together-card {
+            animation: softPulse 4s ease-in-out infinite;
+        }
+
+        .love-stats {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .love-stats div {
+            padding: 4px 0;
+        }
+
+        @keyframes moodTextFade {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translateY(0);
+            }
+        }
+
+        .mood-text.animate {
+            animation: moodTextFade 0.3s ease;
+        }
+
+        .emotion-btn.selected {
+            outline: 3px solid #ec4899;
+            transform: scale(1.1);
+        }
+
+        .mood-item{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:4px;
+        }
+
+        .mood-label{
+            font-size:0.75rem;
+            opacity:0.7;
+        }
+
+        .emotion-btn{
+            position:relative;
+        }
+
+        .emotion-btn::after{
+            content: attr(data-label);
+            position:absolute;
+            top:-30px;
+            left:50%;
+            transform:translateX(-50%);
+            background:rgba(0,0,0,0.75);
+            color:white;
+            font-size:0.7rem;
+            padding:4px 8px;
+            border-radius:6px;
+            opacity:0;
+            pointer-events:none;
+            transition:opacity 0.2s;
+            white-space:nowrap;
+        }
+
+        .emotion-btn:hover::after{
+            opacity:1;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="orb-bg">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+    </div>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+        <div id="appLoader" class="loader">
+            <div class="loader-heart">💖</div>
+            <div class="loader-text">Syncing your private space…</div>
+        </div>
+
+    <div class="main-wrapper">
+        <!-- Welcome Screen -->
+        <div class="screen" id="welcomeScreen">
+            <div class="welcome-content">
+                <h1>💑 Our Private Space</h1>
+                <p>Where only your love exists</p>
+                
+                <div class="role-buttons">
+                    <button class="role-btn role-btn-him" onclick="setProfile('him')">
+                        <div class="role-emoji">💙</div>
+                        <div>Continue as Him</div>
+                    </button>
+                    <button class="role-btn role-btn-her" onclick="setProfile('her')">
+                        <div class="role-emoji">💖</div>
+                        <div>Continue as Her</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div class="screen" id="dashboardScreen">
+            <div class="glass dashboard-header">
+                <div class="header-left">
+                    <h2 id="welcomeText">Welcome Back 💕</h2>
+                    <div class="header-info">
+                        <span class="role-badge" id="roleBadge">💙 Him</span>
+                        <div class="online-indicator">
+                            <div class="online-dot"></div>
+                            <span>You're connected</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" onclick="showSwitchConfirm()" title="Switch Role">🔄</button>
+                    <button id="themeBtn" class="icon-btn" onclick="toggleDarkMode()" title="Toggle Theme">🌙</button>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="content-grid">
+                    <div class="card glass partner-mood-card">
+                        <div class="card-title">💭 Their Mood</div>
+                        <div class="mood-emoji" id="partnerMoodEmoji">😊</div>
+                        <div class="mood-text" id="partnerMoodText">They're feeling wonderful!</div>
+                    </div>
+
+                    <div class="card glass emotions-card">
+                        <div class="card-title">💌 Share Your Mood</div>
+                        <div class="emotions-grid" id="moodGrid">
+                            <!-- Always visible (2 rows on mobile) -->
+                            <button class="emotion-btn" data-label="Happy" onclick="changeMood('😊')">😊</button>
+                            <button class="emotion-btn" data-label="In Love" onclick="changeMood('😍')">😍</button>
+                            <button class="emotion-btn" data-label="Extra close to you" onclick="changeMood('🥰')">🥰</button>
+                            <button class="emotion-btn" data-label="Cool" onclick="changeMood('😎')">😎</button>
+
+                            <!-- Hidden moods -->
+                            <button class="emotion-btn extra-mood" data-label="Sleepy" onclick="changeMood('😴')">😴</button>
+                            <button class="emotion-btn extra-mood" data-label="Sad" onclick="changeMood('😢')">😢</button>
+                            <button class="emotion-btn extra-mood" data-label="Upset" onclick="changeMood('😔')">😔</button>
+                            <button class="emotion-btn extra-mood" data-label="Hugging" onclick="changeMood('🤗')">🤗</button>
+                            <button class="emotion-btn extra-mood" data-label="Missing you" onclick="changeMood('🥺')">🥺</button>
+                            <button class="emotion-btn extra-mood" data-label="Peaceful mood" onclick="changeMood('😇')">😇</button>
+                            <button class="emotion-btn extra-mood" data-label="Normal & Neutral" onclick="changeMood('😐')">😐</button>
+                            <button class="emotion-btn extra-mood" data-label="Thinking" onclick="changeMood('🤔')">🤔</button>
+                            <button class="emotion-btn extra-mood" data-label="Confused" onclick="changeMood('😕')">😕</button>
+                            <button class="emotion-btn extra-mood" data-label="Frustrated" onclick="changeMood('😤')">😤</button>
+                            <button class="emotion-btn extra-mood" data-label="Bored" onclick="changeMood('😑')">😑</button>
+                            <button class="emotion-btn extra-mood" data-label="Angry" onclick="changeMood('😡')">😡</button>
+                            <button class="emotion-btn extra-mood" data-label="Cute" onclick="changeMood('😋')">😋</button>
+                            <button class="emotion-btn extra-mood" data-label="Tired" onclick="changeMood('🥱')">🥱</button>
+                            
+                            <!-- Romantic & Love -->
+                            <button class="emotion-btn extra-mood" data-label="Kissing you" onclick="changeMood('😘')">😘</button>
+                            <button class="emotion-btn extra-mood" data-label="Flirting" onclick="changeMood('😏')">😏</button>
+                            <button class="emotion-btn extra-mood" data-label="Blushing for you" onclick="changeMood('🙈')">🙈</button>
+
+                            <!-- Missing & Long Distance -->
+                            <button class="emotion-btn extra-mood" data-label="Waiting for you" onclick="changeMood('⏳')">⏳</button>
+
+                            <!-- Cute & Playful -->
+                            <button class="emotion-btn extra-mood" data-label="Teasing you" onclick="changeMood('😝')">😝</button>
+
+
+                            <!-- Health & Energy -->
+                            <button class="emotion-btn extra-mood" data-label="Not feeling well" onclick="changeMood('🤒')">🤒</button>
+                            <button class="emotion-btn extra-mood" data-label="Headache" onclick="changeMood('🤕')">🤕</button>
+
+                            <!-- Emotional Depth -->
+                            <button class="emotion-btn extra-mood" data-label="Overthinking" onclick="changeMood('💭')">💭</button>
+                            <button class="emotion-btn extra-mood" data-label="Crying a little" onclick="changeMood('😭')">😭</button>
+
+                            <!-- Relationship Moments -->
+                            <button class="emotion-btn extra-mood" data-label="Missing your hug" onclick="changeMood('🫂')">🫂</button>
+                            <button class="emotion-btn extra-mood" data-label="Wants you to call" onclick="changeMood('📞')">📞</button>
+                            <button class="emotion-btn extra-mood" data-label="Thinking about our memories" onclick="changeMood('📸')">📸</button>
+
+                            <!-- Fun / Random -->
+                            <button class="emotion-btn extra-mood" data-label="Gaming" onclick="changeMood('🎮')">🎮</button>
+                            <button class="emotion-btn extra-mood" data-label="Listening music" onclick="changeMood('🎧')">🎧</button>
+
+                        </div>
+
+                        <button class="show-more-btn" onclick="toggleMoods()" id="toggleMoodBtn">
+                            Show more 💕
+                        </button>
+
+                    </div>
+
+                    <div class="card glass love-counter-card">
+                        <div class="card-title">❤️ Little Love Taps</div>
+                        <button class="heart-button" onclick="addLove()">💝</button>
+                        <div class="love-count" id="loveCount">0</div>
+                        <div class="love-label" id="loveLabel">
+                            Little love moments between you and Aditi
+                        </div>
+
+                        <div class="love-stats" id="loveStats"></div>
+                    </div>
+
+                    <div class="card glass together-card">
+                        <div class="card-title">
+                            💞 Together Since
+                            <span style="margin-left:auto;font-size:0.9rem;opacity:0.6;">Forever ♾️</span>
+                        </div>
+
+                        <div class="together-date" id="togetherDateText">Loading...</div>
+                        <div class="together-live">
+                            <div class="time-box">
+                                <div class="time-number" id="daysCount">0</div>
+                                <div class="time-label">Days</div>
+                            </div>
+                            <div class="time-box">
+                                <div class="time-number" id="hoursCount">0</div>
+                                <div class="time-label">Hours</div>
+                            </div>
+                            <div class="time-box">
+                                <div class="time-number" id="minutesCount">0</div>
+                                <div class="time-label">Minutes</div>
+                            </div>
+                            <div class="time-box">
+                                <div class="time-number" id="secondsCount">0</div>
+                                <div class="time-label">Seconds</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card thinking-card">
+                        <div class="card-title" style="color: white;">🕒 Thinking of You</div>
+                        <p style="opacity: 0.9; margin-bottom: 15px; font-size: clamp(0.9rem, 2.5vw, 1rem);">Let Aditi know she's on your mind</p>
+                        <button class="thinking-btn" onclick="sendThinkingAlert()">Send Love 💌</button>
+                        <div id="thinkingLast" style="margin-top:10px;font-size:0.85rem;opacity:0.8;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thinking Alert Modal -->
+    <div class="modal" id="thinkingModal">
+        <div class="modal-content">
+            <div class="modal-emoji">💭</div>
+            <div class="modal-title">Your love is thinking of you! 💕</div>
+            <div class="modal-desc">Right now</div>
+            <button class="modal-btn" onclick="closeThinkingModal()">Aww, Same 💗</button>
+        </div>
+    </div>
+
+    <!-- Switch Profile Confirmation Modal -->
+    <div class="modal" id="switchConfirmModal">
+        <div class="modal-content">
+            <div class="modal-emoji">👤</div>
+            <div class="modal-title">Switch Role?</div>
+            <div class="modal-desc">Are you sure you want to switch to a different role?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="confirmSwitch()">Yes, Switch</button>
+                <button class="modal-btn modal-btn-secondary" onclick="cancelSwitch()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== COMPLETE APP LOGIC =====
+        let activeProfile = null;
+        let appData = {
+            himMood: '😊',
+            herMood: '😊',
+            loveCount: 0,
+            loveTaps: {
+                him: 0,
+                her: 0
+            },
+            thinkingAlert: null,
+            thinkingAlertTime: null,
+            seenTime: null,
+            lastSender: null,
+            theme: 'light',
+            togetherSince: "2024-01-24T00:00:00",
+            roles: {
+                him: null,
+                her: null
+            }
+        };
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDd9zkxPlH6Ujmg1ap_6La8t1C8ASf8ZCY",
+            authDomain: "couple-5fbde.firebaseapp.com",
+            projectId: "couple-5fbde",
+            storageBucket: "couple-5fbde.appspot.com",
+            messagingSenderId: "36868210582",
+            appId: "1:36868210582:web:e621dad6128c1c5178e7b7",
+            measurementId: "G-G6ZVWTCZQH"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let coupleRef;
+        let userId;
+
+        signInAnonymously(auth)
+        .then(async () => {
+            userId = auth.currentUser.uid;
+
+            coupleRef = doc(db, "couples", "mainRoom");
+
+            window.userId = userId;
+            window.coupleRef = coupleRef;
+
+            const snap = await getDoc(coupleRef);
+
+            if (!snap.exists()) {
+                await setDoc(coupleRef, appData);
+            }
+
+            listenForChanges();
+            console.log("Auth success");
+
+        })
+        .catch((error) => {
+            console.error("Firebase auth failed:", error);
+
+            // 🔥 ALWAYS hide loader if Firebase fails
+            document.getElementById('appLoader').classList.add('hidden');
+            document.querySelector('.main-wrapper').classList.add('ready');
+
+            showScreen('welcomeScreen');
+        });
+
+
+        async function saveToFirebase(data) {
+            if (!coupleRef) return;
+            await setDoc(coupleRef, data, { merge: true });
+        }
+
+        function listenForChanges() {
+            onSnapshot(coupleRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    appData = snapshot.data();
+
+                    // Ensure togetherSince always exists
+                    if (!appData.togetherSince) {
+                        appData.togetherSince = "2024-01-24T00:00:00";
+                        saveToFirebase(appData);
+                    }
+
+                    if (!activeProfile) {
+                        attemptRoleRestore();
+                    }
+
+                    refreshDisplay();
+                    checkForAlert();
+                    startTogetherCounter();
+
+
+
+                    // Hide loader
+                    document.getElementById('appLoader').classList.add('hidden');
+
+                    // Show main app
+                    document.querySelector('.main-wrapper').classList.add('ready');
+                    console.log("Snapshot triggered");
+
+                }
+            });
+        }
+
+        // Attempt to restore role from localStorage if it belongs to this user
+        function attemptRoleRestore() {
+            const saved = localStorage.getItem('activeProfile');
+            if (!saved || !userId) {
+                showScreen('welcomeScreen');
+                return;
+            }
+
+            if (appData.roles[saved] === userId) {
+                activeProfile = saved;
+                showScreen('dashboardScreen');
+            } else {
+                localStorage.removeItem('activeProfile');
+                showScreen('welcomeScreen');
+            }
+        }
+
+        window.saveToFirebase = saveToFirebase;
+        window.getDoc = getDoc;
+    </script>
+
+
+    <script>
+
+        let lastAlertTimeShown = null;
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initHearts();
+        });
+
+
+        // Initialize floating hearts
+        function initHearts() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💓', '💞'];
+            for (let i = 0; i < 20; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart-float';
+                h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                h.style.left = Math.random() * 100 + '%';
+                h.style.top = Math.random() * 100 + '%';
+                h.style.animationDuration = (6 + Math.random() * 8) + 's';
+                h.style.animationDelay = Math.random() * 5 + 's';
+                h.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+                container.appendChild(h);
+            }
+        }
+
+
+        // Set active profile
+        async function setProfile(role) {
+            if (!coupleRef || !userId) {
+                showToast("Connecting... please wait 💕");
+                return;
+            }
+
+            const freshSnap = await getDoc(coupleRef);
+
+            if (!freshSnap.exists()) {
+                showToast("Room not ready yet. Try again.");
+                return;
+            }
+
+            const freshData = freshSnap.data();
+
+            // Safety: ensure roles object exists
+            if (!freshData.roles) {
+                freshData.roles = { him: null, her: null };
+            }
+
+            // If role already taken by someone else
+            if (freshData.roles[role] && freshData.roles[role] !== userId) {
+                showToast("That role is already taken 💕");
+                return;
+            }
+
+            // Remove user from both roles first
+            if (freshData.roles.him === userId) {
+                freshData.roles.him = null;
+            }
+            if (freshData.roles.her === userId) {
+                freshData.roles.her = null;
+            }
+
+            // Assign selected role
+            freshData.roles[role] = userId;
+
+            await saveToFirebase(freshData);
+
+            activeProfile = role;
+            localStorage.setItem('activeProfile', role);
+
+            showScreen('dashboardScreen');
+        }
+
+
+
+
+        // Show switch confirmation modal
+        function showSwitchConfirm() {
+            document.getElementById('switchConfirmModal').classList.add('active');
+        }
+
+        // Confirm profile switch
+        async function confirmSwitch() {
+            document.getElementById('switchConfirmModal').classList.remove('active');
+
+            if (activeProfile) {
+                appData.roles[activeProfile] = null;
+                await saveToFirebase(appData);
+            }
+
+            activeProfile = null;
+            localStorage.removeItem('activeProfile');
+
+            showScreen('welcomeScreen');
+        }
+
+
+        // Cancel profile switch
+        function cancelSwitch() {
+            document.getElementById('switchConfirmModal').classList.remove('active');
+        }
+
+
+        // Change mood
+        function changeMood(emoji) {
+            if (!activeProfile) {
+                showToast("Select your profile first 💕");
+                return;
+            }
+
+            if (activeProfile === 'him') {
+                appData.himMood = emoji;
+            } else {
+                appData.herMood = emoji;
+            }
+
+            document.querySelectorAll('.emotion-btn').forEach(btn=>{
+                btn.classList.remove('selected');
+            });
+
+            event.target.classList.add('selected');
+
+            saveToFirebase(appData);
+            showToast('Mood shared! 💌');
+            burstHearts();
+            refreshDisplay();
+        }
+
+
+        // Add to love counter
+        function addLove() {
+            if (!activeProfile) {
+                showToast("Select your profile first 💕");
+                return;
+            }
+
+            appData.loveCount++;
+
+            // 👇 Increase personal tap count
+            if (!appData.loveTaps) {
+                appData.loveTaps = { him: 0, her: 0 };
+            }
+
+            appData.loveTaps[activeProfile]++;
+
+            saveToFirebase(appData);
+
+            pulseCounter();
+            refreshDisplay();
+        }
+
+
+
+        // Send thinking alert
+        function sendThinkingAlert() {
+            if (!activeProfile) {
+                showToast("Select your profile first 💕");
+                return;
+            }
+
+            appData.thinkingAlert = activeProfile;
+            appData.lastSender = activeProfile;   // ⭐ store sender
+            appData.thinkingAlertTime = Date.now();
+            saveToFirebase(appData);
+
+            showToast('Alert sent! 💭');
+        }
+
+
+        // Check for incoming thinking alert
+        function checkForAlert() {
+            if (!activeProfile) return;
+
+            if (
+                appData.thinkingAlert &&
+                appData.thinkingAlert !== activeProfile &&
+                appData.thinkingAlertTime !== lastAlertTimeShown
+            ) {
+                lastAlertTimeShown = appData.thinkingAlertTime;
+                showThinkingAlert();
+            }
+        }
+
+        // Format alert time for display
+        function formatAlertTime(timestamp) {
+            const alertDate = new Date(timestamp);
+            const now = new Date();
+
+            const diffMs = now - alertDate;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+            let agoText = "";
+
+            if (diffMinutes < 1) {
+                agoText = "Just now";
+            } else if (diffMinutes < 60) {
+                agoText = `${diffMinutes} min ago`;
+            }
+
+            const isToday =
+                alertDate.toDateString() === now.toDateString();
+
+            const tomorrow = new Date();
+            tomorrow.setDate(now.getDate() + 1);
+
+            const isTomorrow =
+                alertDate.toDateString() === tomorrow.toDateString();
+
+            const timeString = alertDate.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            let mainText;
+
+            if (isToday) {
+                mainText = `Today at ${timeString}`;
+            } 
+            else if (isTomorrow) {
+                mainText = `Tomorrow at ${timeString}`;
+            } 
+            else {
+
+                const d = alertDate.getDate().toString().padStart(2,'0');
+                const m = (alertDate.getMonth() + 1).toString().padStart(2,'0');
+                const y = alertDate.getFullYear();
+
+                mainText = `${d}/${m}/${y} at ${timeString}`;
+            }
+
+            return agoText ? `${mainText} • ${agoText}` : mainText;
+        }
+
+
+
+        // Close thinking modal
+        function closeThinkingModal() {
+            document.getElementById('thinkingModal').classList.remove('active');
+
+                // Save seen time
+                appData.seenTime = Date.now();
+
+            appData.thinkingAlert = null;
+            appData.thinkingAlertTime = null;
+            saveToFirebase(appData);
+        }
+
+
+        // Show thinking modal
+        function showThinkingAlert() {
+            const modal = document.getElementById('thinkingModal');
+
+            const senderName = activeProfile === 'him' ? 'Aditi' : 'Shankar';
+
+            document.querySelector('.modal-title').textContent =
+                `${senderName} is thinking of you 💕`;
+
+            const formattedTime = formatAlertTime(appData.thinkingAlertTime);
+            document.querySelector('.modal-desc').textContent = formattedTime;
+
+            modal.classList.add('active');
+        }
+
+
+        // Refresh UI
+        function refreshDisplay() {
+
+            // ALWAYS sync theme
+            if (appData.theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+
+            // Update theme icon
+            document.getElementById("themeBtn").textContent =
+                appData.theme === "dark" ? "☀️" : "🌙";
+
+            if (!activeProfile) return;
+
+            const myName = activeProfile === 'him' ? 'Shankar' : 'Aditi';
+            document.getElementById('roleBadge').textContent = myName;
+
+            const welcomeEl = document.getElementById('welcomeText');
+            welcomeEl.textContent = `Welcome back, ${myName} 💕`;
+
+
+            const partnerRole = activeProfile === 'him' ? 'her' : 'him';
+            const partnerName = partnerRole === 'her' ? 'Aditi' : 'Shankar';
+
+            const loveLabel = document.getElementById('loveLabel');
+
+            if (activeProfile === 'him') {
+                loveLabel.textContent = "Your little love moments with Aditi";
+            } else {
+                loveLabel.textContent = "Your little love moments with Shankar";
+            }
+
+
+            const partnerMood =
+                partnerRole === 'her' ? appData.herMood : appData.himMood;
+
+
+            document.getElementById('partnerMoodEmoji').textContent = partnerMood;
+
+            // Restore selected mood highlight
+            const myMood = activeProfile === 'him' ? appData.himMood : appData.herMood;
+
+            document.querySelectorAll('.emotion-btn').forEach(btn => {
+                btn.classList.remove('selected');
+
+                if (btn.textContent === myMood) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            const messages = {
+                '😊': `${partnerName} is feeling happy today 🌸`,
+                '😍': `${partnerName} can't stop thinking about you 💕`,
+                '🥰': `${partnerName} feels extra close to you right now 🫶`,
+                '😎': `${partnerName} is feeling confident and cool 😌`,
+                '😴': `${partnerName} is a little tired and needs cuddles 💤`,
+                '😢': `${partnerName} is feeling a bit emotional today 💔`,
+                '😔': `${partnerName} is slightly upset… maybe needs love 🥺`,
+                '🤗': `${partnerName} really wants a warm hug from you 🤍`,
+                '🥺': `${partnerName} is missing you badly right now 💭`,
+                '😇': `${partnerName} is in a pure and peaceful mood ✨`,
+                '😐': `${partnerName} is feeling normal today 🙂`,
+                '🤔': `${partnerName} is thinking about something 🤔`,
+                '😕': `${partnerName} is a little confused today 😕`,
+                '😤': `${partnerName} feels a bit frustrated 😤`,
+                '😑': `${partnerName} is a little bored today 😑`,
+                '😡': `${partnerName} might be a bit angry 😡`,
+                '😋': `${partnerName} is feeling playful and cute 😋`,
+                '🥱': `${partnerName} is very sleepy right now 🥱`,
+                
+                // 💖 Romantic & Love
+                '😘': `${partnerName} is sending you kisses right now 😘`,
+                '😏': `${partnerName} is flirting with you 😏`,
+                '🙈': `${partnerName} is blushing thinking about you 🙈`,
+
+                // ⏳ Missing & Distance
+                '⏳': `${partnerName} is waiting for you patiently ⏳`,
+
+                // 😜 Playful
+                '😝': `${partnerName} is teasing you playfully 😝`,
+
+                // 🤒 Health
+                '🤒': `${partnerName} is not feeling well…🤒`,
+                '🤕': `${partnerName} has a headache 🤕`,
+
+                // 💭 Emotional depth
+                '💭': `${partnerName} is lost in thoughts about you 💭`,
+                '😭': `${partnerName} is crying… maybe needs your love 😭`,
+
+                // 🫂 Relationship moments
+                '🫂': `${partnerName} really wants your hug right now 🫂`,
+                '📞': `${partnerName} wants to hear your voice 📞`,
+                '📸': `${partnerName} is thinking about your memories 📸`,
+
+                // 🎮 Fun / Activity
+                '🎮': `${partnerName} is gaming right now 🎮`,
+                '🎧': `${partnerName} is lost in music 🎧`,
+            };
+
+            const moodTextEl = document.getElementById('partnerMoodText');
+
+            moodTextEl.classList.remove('animate');
+            void moodTextEl.offsetWidth; // restart animation
+
+            moodTextEl.textContent =
+                messages[partnerMood] || `${partnerName} is thinking about you 💞`;
+
+            moodTextEl.classList.add('animate');
+
+
+            document.getElementById('loveCount').textContent = appData.loveCount;
+            
+            // Ensure structure exists
+            if (!appData.loveTaps) {
+                appData.loveTaps = { him: 0, her: 0 };
+            }
+
+            const himTaps = appData.loveTaps.him || 0;
+            const herTaps = appData.loveTaps.her || 0;
+
+            let crownHim = '';
+            let crownHer = '';
+
+            if (himTaps > herTaps) {
+                crownHim = ' 👑';
+            } else if (herTaps > himTaps) {
+                crownHer = ' 👑';
+            }
+
+            const statsHTML = `
+                <div>Shankar: ${himTaps} taps${crownHim}</div>
+                <div>Aditi: ${herTaps} taps${crownHer}</div>
+            `;
+
+            document.getElementById('loveStats').innerHTML = statsHTML;
+
+
+            // ALSO show seen time if exists and no current alert
+            const lastEl = document.getElementById("thinkingLast");
+
+            // If YOU sent the alert and it is still active
+            if (appData.thinkingAlertTime && appData.lastSender === activeProfile) {
+
+                lastEl.textContent =
+                    "You sent love • " + formatAlertTime(appData.thinkingAlertTime);
+
+            }
+
+            // If YOU sent it and partner has seen it
+            else if (appData.seenTime && appData.lastSender === activeProfile) {
+
+                lastEl.textContent =
+                    "Seen by your love • " + formatAlertTime(appData.seenTime);
+
+            }
+
+            // If partner sent it (you are receiver)
+            else if (appData.lastSender && appData.lastSender !== activeProfile) {
+
+                lastEl.textContent = "";
+
+            }
+
+            // Nothing sent yet
+            else {
+
+                lastEl.textContent = "No love sent yet 💭";
+
+            }
+        }
+
+
+        // Pulse animation
+        function pulseCounter() {
+            const el = document.getElementById('loveCount');
+            el.style.animation = 'none';
+            setTimeout(() => {
+                el.style.animation = 'heart-pulse 0.6s ease-out';
+            }, 10);
+        }
+
+        // Heart burst
+        function burstHearts() {
+            const hearts = ['❤️', '💕', '💖', '💗', '💝'];
+            for (let i = 0; i < 12; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart-float';
+                h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                h.style.position = 'fixed';
+                h.style.left = (Math.random() * 60 + 20) + '%';
+                h.style.top = '50%';
+                h.style.fontSize = '1.5rem';
+                h.style.animation = 'drift 2s linear forwards';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 2000);
+            }
+        }
+
+        // Show toast
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transition = 'opacity 0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 2700);
+        }
+
+        // Toggle screen
+        function showScreen(id) {
+            const screens = document.querySelectorAll('.screen');
+
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            const next = document.getElementById(id);
+
+            // Small delay for smoother stacking effect
+            setTimeout(() => {
+                next.classList.add('active');
+            }, 10);
+        }
+
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            if (!activeProfile) {
+                showToast("Select your profile first 💕");
+                return;
+            }
+
+            const isDark = document.body.classList.toggle('dark-mode');
+
+            appData.theme = isDark ? 'dark' : 'light';
+
+            // update icon
+            document.getElementById("themeBtn").textContent = isDark ? "☀️" : "🌙";
+            saveToFirebase(appData);
+        }
+
+        let togetherInterval = null;
+        let lastStartDate = null;
+
+
+        function startTogetherCounter() {
+            if (!appData.togetherSince) return;
+
+            // If date didn't change, don't restart
+            if (appData.togetherSince === lastStartDate) return;
+
+            lastStartDate = appData.togetherSince;
+
+            // Clear old interval if exists
+            if (togetherInterval) {
+                clearInterval(togetherInterval);
+            }
+
+            const startDate = new Date(appData.togetherSince);
+            
+            if (isNaN(startDate.getTime())) {
+                console.error("Invalid togetherSince date:", appData.togetherSince);
+                return;
+            }
+
+
+            document.getElementById("togetherDateText").textContent =
+                startDate.toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+            function updateCounter() {
+                const now = new Date();
+                const diff = now - startDate;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+
+                animateNumber("daysCount", days);
+                animateNumber("hoursCount", hours);
+                animateNumber("minutesCount", minutes);
+                animateNumber("secondsCount", seconds);
+            }
+
+            updateCounter();
+            togetherInterval = setInterval(updateCounter, 1000);
+        }
+
+
+        function animateNumber(id, value) {
+            const el = document.getElementById(id);
+
+            if (el.textContent == value) return;
+
+            el.style.opacity = "0";
+            el.style.transform = "rotateX(90deg)";
+
+            setTimeout(() => {
+                el.textContent = value;
+                el.style.transform = "rotateX(0deg)";
+                el.style.opacity = "1";
+            }, 150);
+        }
+
+        // Toggle extra moods
+        function toggleMoods() {
+            const grid = document.getElementById('moodGrid');
+            const btn = document.getElementById('toggleMoodBtn');
+
+            grid.classList.toggle('expanded');
+
+            if (grid.classList.contains('expanded')) {
+                btn.textContent = "Show less ✨";
+            } else {
+                btn.textContent = "Show more 💕";
+            }
+        }
+
+
+
+        setTimeout(() => {
+            const loader = document.getElementById('appLoader');
+            if (!loader.classList.contains('hidden')) {
+                console.warn("Firebase timeout fallback triggered");
+                loader.classList.add('hidden');
+                document.querySelector('.main-wrapper').classList.add('ready');
+                showScreen('welcomeScreen');
+            }
+        }, 6000);
+
+    </script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log("PWA Ready ✅"))
+            .catch(err => console.log("SW Error:", err));
+        });
+        }
+    </script>
+</html>
